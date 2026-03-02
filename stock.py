@@ -1,16 +1,22 @@
 import akshare as ak
 
-# 使用新浪财经接口获取全市场A股数据（包含市净率）
-df = ak.stock_zh_a_spot()
+# 测试各个可能的接口
+interfaces = [
+    ("东方财富全A", "stock_zh_a_spot_em"),
+    ("新浪全A", "stock_zh_a_spot_sina"),
+    ("腾讯全A", "stock_zh_a_spot"),
+    ("深市A股", "stock_sz_a_spot_em"),
+    ("沪市A股", "stock_sh_a_spot_em"),
+]
 
-# 查看数据结构，确认包含市净率字段
-print(df.columns.tolist())  # 输出列名，确认有 'pb'
-
-# 统计破净股占比
-total_stocks = len(df)
-below_pb_count = len(df[df['pb'] < 1])
-ratio = below_pb_count / total_stocks
-
-print(f"全市场股票总数: {total_stocks}")
-print(f"破净股数量: {below_pb_count}")
-print(f"破净股占比: {ratio:.2%}")
+for name, func_name in interfaces:
+    try:
+        func = getattr(ak, func_name)
+        df = func()
+        print(f"=== {name} ({func_name}) 接口 ===")
+        print(f"总行数: {len(df)}")
+        print(f"列名: {list(df.columns)[:15]}")  # 只显示前15列
+        print("是否包含市净率相关列:", any("市净率" in col or "pb" in col.lower() for col in df.columns))
+        print()
+    except Exception as e:
+        print(f"{name} 接口失败: {str(e)[:100]}\n")

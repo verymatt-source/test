@@ -1,31 +1,16 @@
-# 1. 导入库
 import akshare as ak
-from datetime import datetime
 
-print("步骤1: 导入库完成")
+# 使用新浪财经接口获取全市场A股数据（包含市净率）
+df = ak.stock_zh_a_spot()
 
-# 2. 获取数据
-print("步骤2: 开始获取股票数据...")
-try:
-    stock_df = ak.stock_zh_a_spot_em()
-    print(f"步骤2: 获取成功，共 {len(stock_df)} 行数据")
-except Exception as e:
-    print(f"步骤2: 获取失败 - {e}")
-    exit(1)
+# 查看数据结构，确认包含市净率字段
+print(df.columns.tolist())  # 输出列名，确认有 'pb'
 
-# 3. 生成文件名
-filename = f'stock_data.csv'
-print(f"步骤3: 将保存到当前目录下的 {filename}")
+# 统计破净股占比
+total_stocks = len(df)
+below_pb_count = len(df[df['pb'] < 1])
+ratio = below_pb_count / total_stocks
 
-# 4. 保存CSV
-print("步骤4: 正在保存CSV文件...")
-try:
-    stock_df.to_csv(filename, index=False, encoding='utf-8-sig')
-    print(f"步骤4: 保存成功！文件: {filename}")
-except Exception as e:
-    print(f"步骤4: 保存失败 - {e}")
-    exit(1)
-
-# 5. 完成
-print("步骤5: 脚本执行完成！")
-print(f"数据已保存到: {filename}")
+print(f"全市场股票总数: {total_stocks}")
+print(f"破净股数量: {below_pb_count}")
+print(f"破净股占比: {ratio:.2%}")

@@ -1,0 +1,30 @@
+name: Get Stock Data
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  get-stock:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 1. 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 2. 安装Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: 3. 安装akshare
+      run: pip install akshare
+    
+    - name: 4. 运行脚本
+      run: python stock.py
+    
+    - name: 5. 查看生成的文件
+      run: |
+        echo "当前目录文件列表:"
+        ls -la
+        echo "CSV文件前3行:"
+        head -n 3 stock_data.csv
